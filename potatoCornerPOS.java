@@ -9,9 +9,6 @@ public class potatoCornerPOS {
         while (choice != 4) {
 
             System.out.println("================================");
-            System.out.println("        UNDER CONSTRUCTION        ");
-            System.out.println("================================");
-            System.out.println("================================");
             System.out.println("  POTATO CORNER ORDERING SYSTEM ");
             System.out.println("================================");
             System.out.println("1. Order/Add Item");
