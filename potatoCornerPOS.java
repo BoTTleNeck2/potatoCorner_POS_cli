@@ -1,12 +1,10 @@
-import java.util.Scanner;
-import java.io.FileInputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class potatoCornerPOS {
     public static void main(String[] args) {
-        
+
         Scanner input = new Scanner(System.in);
         ArrayList<OrderItem> items = new ArrayList<>();
         boolean running = true;
@@ -32,7 +30,8 @@ public class potatoCornerPOS {
                     break;
 
                 case 2:
-                    System.out.println("Under Construction");
+                    viewCartCheckout render = new viewCartCheckout();
+                    render.viewCartLogic(items);
                     break;
 
                 case 3:
@@ -44,11 +43,12 @@ public class potatoCornerPOS {
                     break;
                 
             }
+            
         }
         input.close();
     }
 
-    // basically a method for input validation so it wont crash
+    // basically a method for input validation so para ma catch pag letter or symbol yung input at hindi mag crash
     public static int inputValidation(Scanner input){
         while(!input.hasNextInt()){
             System.out.print("letters are not allowed! enter a number: ");
@@ -57,7 +57,6 @@ public class potatoCornerPOS {
         return input.nextInt();
     }
     
-    //this class is basically template to bundle organized information for everything
     public static class OrderItem{
         private String size;
         private List<String> flavors;
@@ -65,6 +64,7 @@ public class potatoCornerPOS {
         private double unitPrice;
         private double itemTotal;
 
+        // constructor
         public OrderItem(String size, List<String> flavors, int quantity){
             this.size = size;
             this.flavors = flavors;
@@ -73,7 +73,7 @@ public class potatoCornerPOS {
             this.itemTotal = this.unitPrice * quantity;
         }
 
-        // sizes and prices
+        // size formatter and prices
         private double calculateUnitPrice(String size){
             
             switch(size.toUpperCase()){
@@ -171,5 +171,34 @@ public class potatoCornerPOS {
         items.add(newItem);
 
         System.out.println("\n Order Success! added to cart: " + quantity + "pcs " + sizeChoice + " fries, " + selectedFlavors);
+    }
+
+    public static class viewCartCheckout{
+        
+        public void viewCartLogic(ArrayList <OrderItem> print){
+            System.out.println("\n=========== VIEW CART ==========");
+            if (print.isEmpty()){
+                System.out.println("Your cart is empty.");
+                return;
+            }
+        
+
+            double grandTotal = 0;
+
+            for (int i = 0; i < print.size(); i++){
+                OrderItem item = print.get(i);
+
+                System.out.println("\nOrder #" + (i + 1));
+                System.out.println("Size: " + item.getSize());
+                System.out.println("Flavors: " + item.getFlavors());
+                System.out.println("Quantity: " + item.getQuantity());
+
+                System.out.printf("Subtotal: P%.2f%n",item.getItemTotal());
+
+                grandTotal += item.getItemTotal();
+            }
+
+            System.out.println("GRAND TOTAL: " + grandTotal);
+        }
     }
 }
