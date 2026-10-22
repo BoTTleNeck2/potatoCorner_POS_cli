@@ -11,12 +11,13 @@ public class potatoCornerPOS {
 
         while (running) {
 
+            clearScreen();
             System.out.println("================================");
             System.out.println("  POTATO CORNER ORDERING SYSTEM ");
             System.out.println("================================");
-            System.out.println("1. Order/Add Item");
-            System.out.println("2. View Cart");
-            System.out.println("3. Checkout");
+            System.out.println("1. Order");
+            System.out.println("2. View Cart/Checkout");
+            System.out.println("3. Clear cart");
             System.out.println("4. Exit System");
             System.out.println("================================");
             System.out.print("Enter your choice: ");
@@ -31,11 +32,12 @@ public class potatoCornerPOS {
 
                 case 2:
                     viewCartCheckout render = new viewCartCheckout();
-                    render.viewCartLogic(items);
+                    render.viewCartLogic(items, input);
                     break;
 
                 case 3:
-                   System.out.println("Under Construction");
+                    viewCartCheckout show = new viewCartCheckout();
+                    show.clearCart(items, input);
                     break;
 
                 case 4:
@@ -56,7 +58,19 @@ public class potatoCornerPOS {
         }
         return input.nextInt();
     }
+
+    // it clears text
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
     
+    // nextline method so it wont immediately goes to menu unless user press something to continue
+    public static void pauseUser(Scanner input){
+        System.out.print("\nPress any key to return ");
+        input.nextLine(); 
+        input.nextLine();
+    }
     public static class OrderItem{
         private String size;
         private List<String> flavors;
@@ -120,6 +134,7 @@ public class potatoCornerPOS {
         String[] sizes = {"regular", "large", "jumbo", "mega", "giga", "tera"};
         String[] flavors = {"cheese","chili cheese", "barbecue", "sour cream", "chili BBQ", "golden sweet corn", "white cheedar", "wasabi", "truffle"};
 
+        clearScreen();
         System.out.println("\n====CHOOSE SIZES====");
         for(int i = 0; i < sizes.length; i++){
             System.out.println((1 + i) + ". " + sizes[i]);
@@ -175,14 +190,18 @@ public class potatoCornerPOS {
 
     public static class viewCartCheckout{
         
-        public void viewCartLogic(ArrayList <OrderItem> print){
+        // logic to view your current order
+        public void viewCartLogic(ArrayList <OrderItem> print, Scanner input){
+            clearScreen();
+            
             System.out.println("\n=========== VIEW CART ==========");
             if (print.isEmpty()){
                 System.out.println("Your cart is empty.");
+                pauseUser(input);
                 return;
             }
-        
-
+            
+            
             double grandTotal = 0;
 
             for (int i = 0; i < print.size(); i++){
@@ -196,9 +215,38 @@ public class potatoCornerPOS {
                 System.out.printf("Subtotal: P%.2f%n",item.getItemTotal());
 
                 grandTotal += item.getItemTotal();
+
             }
 
             System.out.println("GRAND TOTAL: " + grandTotal);
+            pauseUser(input);
+        }
+
+        // logic for clearing your orders currently 
+        public void clearCart(ArrayList <OrderItem> clear, Scanner input){
+            if(clear.isEmpty()){
+                clearScreen();
+                System.out.println("Your Cart is empty!");
+                pauseUser(input);
+            }
+            else{
+                clearScreen();
+                System.out.print("Are you sure want to clear your cart? (Y/N): ");
+                String confirm = input.next();
+
+                input.hasNextLine();
+
+                if(confirm.equalsIgnoreCase("Y")){
+                    clear.clear();
+                    System.out.println("\nCart cleared successfully!");
+                    pauseUser(input);
+                }    
+                else{
+                    System.out.println("\nAction cancelled");
+                    pauseUser(input);
+                }
+                
+            }
         }
     }
 }
