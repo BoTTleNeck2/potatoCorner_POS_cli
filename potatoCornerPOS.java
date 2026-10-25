@@ -143,7 +143,7 @@ public class potatoCornerPOS {
         String[] sizePrices = {"41.0", "67.0", "97.0", "127.0", "198.0", "228.0"};
 
         clearScreen();
-        System.out.println("\n====CHOOSE SIZES====" + "\n");
+        System.out.println("\n====CHOOSE SIZES====\n");
         for(int i = 0; i < sizes.length; i++){
             System.out.println((1 + i) + ". " + sizes[i] + " - P" + sizePrices[i]);
         }
@@ -245,8 +245,7 @@ public class potatoCornerPOS {
 
         public void receiptGenerator(ArrayList<OrderItem> print, Scanner input){
             
-            String folderName = "Receipts"; 
-            String filename = folderName + "PotatoCornerReceipt.txt";
+            String filename = "PotatoCornerReceipt.txt";
 
             if(print.isEmpty()){
                 clearScreen();
@@ -280,12 +279,6 @@ public class potatoCornerPOS {
             double change = cashPaid - grandTotal;
             System.out.printf("Total change P%.2f\n", change);
 
-            //this create folder automatically if the folder doesnt exit!
-            File folder = new File(folderName);
-            if(! folder.exists()){
-                folder.mkdir();
-            }
-
             try (PrintWriter save = new PrintWriter(new FileOutputStream(filename))) {
                 
                 save.println("================================");
@@ -307,7 +300,8 @@ public class potatoCornerPOS {
                 save.println("================================");
                 save.println("     THANK YOU FOR PURCHASE!    ");
                 save.println("================================");
-
+                
+                clearScreen();
                 pauseUser("\n receipt save successfully to " + filename +"\n press any key to continue: ");
                 print.clear();
 
