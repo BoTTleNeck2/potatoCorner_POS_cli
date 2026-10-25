@@ -1,6 +1,12 @@
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.File;
 
 public class potatoCornerPOS {
     public static void main(String[] args) {
@@ -16,8 +22,8 @@ public class potatoCornerPOS {
             System.out.println("  POTATO CORNER ORDERING SYSTEM ");
             System.out.println("================================");
             System.out.println("1. Order");
-            System.out.println("2. View Cart/Checkout");
-            System.out.println("3. Clear cart");
+            System.out.println("2. View Cart");
+            System.out.println("3. Checkout");
             System.out.println("4. Exit System");
             System.out.println("================================");
             System.out.print("Enter your choice: ");
@@ -31,13 +37,14 @@ public class potatoCornerPOS {
                     break;
 
                 case 2:
+                    input.nextLine();
                     viewCartCheckout render = new viewCartCheckout();
                     render.viewCartLogic(items, input);
                     break;
 
                 case 3:
-                    viewCartCheckout show = new viewCartCheckout();
-                    show.clearCart(items, input);
+                    viewCartCheckout newRender = new viewCartCheckout();
+                    newRender.receiptGenerator(items, input);
                     break;
 
                 case 4:
@@ -66,9 +73,9 @@ public class potatoCornerPOS {
     }
     
     // nextline method so it wont immediately goes to menu unless user press something to continue
-    public static void pauseUser(Scanner input){
-        System.out.print("\nPress any key to return ");
-        input.nextLine(); 
+    public static void pauseUser(String message){
+        System.out.print(message);
+        Scanner input = new Scanner(System.in); 
         input.nextLine();
     }
     public static class OrderItem{
@@ -133,13 +140,15 @@ public class potatoCornerPOS {
         
         String[] sizes = {"regular", "large", "jumbo", "mega", "giga", "tera"};
         String[] flavors = {"cheese","chili cheese", "barbecue", "sour cream", "chili BBQ", "golden sweet corn", "white cheedar", "wasabi", "truffle"};
+        String[] sizePrices = {"41.0", "67.0", "97.0", "127.0", "198.0", "228.0"};
 
         clearScreen();
-        System.out.println("\n====CHOOSE SIZES====");
+        System.out.println("\n====CHOOSE SIZES====" + "\n");
         for(int i = 0; i < sizes.length; i++){
-            System.out.println((1 + i) + ". " + sizes[i]);
+            System.out.println((1 + i) + ". " + sizes[i] + " - P" + sizePrices[i]);
         }
-        System.out.print("Select sizes: ");
+        System.out.println("\n====================");
+        System.out.print("\nSelect sizes: ");
         int Choice = inputValidation(input);
 
         if(Choice < 1 || Choice > sizes.length){
@@ -196,8 +205,7 @@ public class potatoCornerPOS {
             
             System.out.println("\n=========== VIEW CART ==========");
             if (print.isEmpty()){
-                System.out.println("Your cart is empty.");
-                pauseUser(input);
+                pauseUser("\nCart is empty!\npress any key to continue");
                 return;
             }
             
@@ -219,34 +227,95 @@ public class potatoCornerPOS {
             }
 
             System.out.println("GRAND TOTAL: " + grandTotal);
-            pauseUser(input);
-        }
-
-        // logic for clearing your orders currently 
-        public void clearCart(ArrayList <OrderItem> clear, Scanner input){
-            if(clear.isEmpty()){
+            System.out.println("\nPress any key to return or type CLEAR to empty your cart! ");
+            System.out.print("Action: ");
+            String choice = input.nextLine().trim();
+            
+            // logic for clearing your orders currently 
+            if(choice.equalsIgnoreCase("CLEAR")){
+                print.clear();
                 clearScreen();
-                System.out.println("Your Cart is empty!");
-                pauseUser(input);
+                pauseUser("Cart cleared succesfully! \nEnter any key to return");
             }
             else{
                 clearScreen();
-                System.out.print("Are you sure want to clear your cart? (Y/N): ");
-                String confirm = input.next();
-
-                input.hasNextLine();
-
-                if(confirm.equalsIgnoreCase("Y")){
-                    clear.clear();
-                    System.out.println("\nCart cleared successfully!");
-                    pauseUser(input);
-                }    
-                else{
-                    System.out.println("\nAction cancelled");
-                    pauseUser(input);
-                }
-                
+                pauseUser("Returning to menu.....");
             }
         }
+
+        public void receiptGenerator(ArrayList<OrderItem> print, Scanner input){
+            
+            String folderName = "Receipts"; 
+            String filename = folderName + "PotatoCornerReceipt.txt";
+
+            if(print.isEmpty()){
+                clearScreen();
+                System.out.println("=========== CHECKOUT ==========");
+                pauseUser("\nEmpty cart! cannot proceed\npress any key to continue: ");
+            }
+
+            double grandTotal = 0.0;
+            for(int i = 0; i < print.size(); i++){
+                grandTotal += print.get(i).getItemTotal();
+            }
+
+            //paying logic
+            System.out.println("\n=========== CHECKOUT ==========");
+            System.out.printf("Grand total to pay: " + grandTotal);
+
+            double cashPaid = 0.0;
+            while(cashPaid < grandTotal){
+                System.out.print("\nEnter cash amount: ");
+                if(input.hasNextDouble()){
+                    cashPaid = input.nextDouble();   
+                    if(cashPaid < grandTotal){
+                        System.out.printf("Insufficent amount! need P%.2f\n", (grandTotal - cashPaid));
+                    }
+                }
+                else{
+                    pauseUser("Invalid input! \npress any key to continue: ");
+                }
+            }
+
+            double change = cashPaid - grandTotal;
+            System.out.printf("Total change P%.2f\n", change);
+
+            //this create folder automatically if the folder doesnt exit!
+            File folder = new File(folderName);
+            if(! folder.exists()){
+                folder.mkdir();
+            }
+
+            try (PrintWriter save = new PrintWriter(new FileOutputStream(filename))) {
+                
+                save.println("================================");
+                save.println("      POTATO CORNER RECEIPT     ");
+                save.println("================================");
+
+                for(int i = 0; i < print.size(); i++){
+                    OrderItem order = print.get(i);
+                    save.println("ORDER " +(1 + i));
+                    save.printf("%dx %s Fries\n", order.getQuantity(), order.getSize());
+                    save.println("Flavors: " + String.join(", ", order.getFlavors()));
+                    save.printf("Subtotal:  P%.2f\n", order.getItemTotal());
+                    save.println("-------------------------------");
+                }
+                save.println("================================");
+                save.printf("GRAND TOTAL :  P%.2f\n", grandTotal);
+                save.printf("CASH PAID :  P%.2f\n", cashPaid);
+                save.printf("CHANGE :  P%.2f\n", change);
+                save.println("================================");
+                save.println("     THANK YOU FOR PURCHASE!    ");
+                save.println("================================");
+
+                pauseUser("\n receipt save successfully to " + filename +"\n press any key to continue: ");
+                print.clear();
+
+
+            } catch (IOException e) {
+                pauseUser("\nerror writing a save \npress any key: " + e.getMessage());
+            }
+        }
+
     }
 }
