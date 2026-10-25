@@ -152,7 +152,7 @@ public class potatoCornerPOS {
         int Choice = inputValidation(input);
 
         if(Choice < 1 || Choice > sizes.length){
-            System.out.println("invalid size selection! returning to menu.");
+            pauseUser("invalid size selection! returning to menu.");
             return;
         }
         String sizeChoice = sizes[Choice - 1];
@@ -188,7 +188,7 @@ public class potatoCornerPOS {
         int quantity = inputValidation(input);
 
         if(quantity <= 0){
-            System.out.println("there must be atleast 1 order. setting quantity to 1");
+            pauseUser("there must be atleast 1 order. setting quantity to 1");
             quantity = 1;
         }
         OrderItem newItem = new OrderItem(sizeChoice, selectedFlavors, quantity);
@@ -251,6 +251,7 @@ public class potatoCornerPOS {
                 clearScreen();
                 System.out.println("=========== CHECKOUT ==========");
                 pauseUser("\nEmpty cart! cannot proceed\npress any key to continue: ");
+                return;
             }
 
             double grandTotal = 0.0;
