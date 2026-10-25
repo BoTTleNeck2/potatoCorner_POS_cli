@@ -294,7 +294,6 @@ public class potatoCornerPOS {
                     save.printf("Subtotal:  P%.2f\n", order.getItemTotal());
                     save.println("-------------------------------");
                 }
-                save.println("================================");
                 save.printf("GRAND TOTAL :  P%.2f\n", grandTotal);
                 save.printf("CASH PAID :  P%.2f\n", cashPaid);
                 save.printf("CHANGE :  P%.2f\n", change);
