@@ -31,18 +31,19 @@ public class potatoCornerPOS {
             switch (choice) {
 
                 case 1:
-                    addItemToCart(input, items);
+                    systemLogic render = new systemLogic();
+                    render.addItemToCart(input, items);
                     break;
 
                 case 2:
                     input.nextLine();
-                    viewCartCheckout render = new viewCartCheckout();
-                    render.viewCartLogic(items, input);
+                    systemLogic newRender = new systemLogic();
+                    newRender.viewCartLogic(items, input);
                     break;
 
                 case 3:
-                    viewCartCheckout newRender = new viewCartCheckout();
-                    newRender.receiptGenerator(items, input);
+                    systemLogic neuRender = new systemLogic();
+                    neuRender.receiptGenerator(items, input);
                     break;
 
                 case 4:
@@ -59,7 +60,7 @@ public class potatoCornerPOS {
         }
         input.close();
     }
-
+    
     // basically a method for input validation so para ma catch pag letter or symbol yung input at hindi mag crash
     public static int inputValidation(Scanner input){
         while(!input.hasNextInt()){
@@ -68,7 +69,7 @@ public class potatoCornerPOS {
         }
         return input.nextInt();
     }
-
+    
     // it clears text
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
@@ -80,6 +81,7 @@ public class potatoCornerPOS {
         System.out.print(message); 
         input.nextLine();
     }
+    
     public static class OrderItem{
         private String size;
         private List<String> flavors;
@@ -118,7 +120,7 @@ public class potatoCornerPOS {
 
             return 0.0;
         }
-
+        
         // this 3 methods (getItemtotal, getSize, getQuantity) will be used for view cart :)
         public double getItemTotal(){
             return itemTotal;
@@ -136,10 +138,12 @@ public class potatoCornerPOS {
             return this.quantity;
         }
     }
-    // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
-    public static void addItemToCart(Scanner input, ArrayList<OrderItem> items){
-        int flavorLimit = 1;
+    
+    public static class systemLogic{
         
+        // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
+        public void addItemToCart(Scanner input, ArrayList<OrderItem> items){
+    
         String[] sizes = {"regular", "large", "jumbo", "mega", "giga", "tera"};
         String[] flavors = {"cheese","chili cheese", "barbecue", "sour cream", "chili BBQ", "golden sweet corn", "white cheedar", "wasabi", "truffle"};
         double[] sizePrices = {41.0, 67.0, 97.0, 127.0, 198.0, 228.0};
@@ -163,6 +167,7 @@ public class potatoCornerPOS {
         }
         String sizeChoice = sizes[Choice - 1];
         
+        int flavorLimit = 1;
         String upperSize = sizeChoice.toUpperCase();
         if(upperSize.equals ("JUMBO") || upperSize.equals("MEGA")){
             flavorLimit = 2;
@@ -216,8 +221,7 @@ public class potatoCornerPOS {
         System.out.println("==================================================");
         pauseUser(input, "\nPress ENTER to return to menu...");
     }
-
-    public static class viewCartCheckout{
+        
         
         // logic to view your current order
         public void viewCartLogic(ArrayList <OrderItem> items, Scanner input){
@@ -259,14 +263,15 @@ public class potatoCornerPOS {
             System.out.println("================================================================");
             System.out.println();
             System.out.println("  CART OPTIONS");
-            System.out.println("  [ENTER] Return to Main Menu");
-            System.out.println("  [CLEAR] Remove All Items from Cart");
+            System.out.println("  press ANY KEY Return to Main Menu");
+            System.out.println("  press Y Remove All Items from Cart");
             System.out.println("================================================================");
             System.out.print("  Enter action: ");
             String choice = input.nextLine().trim();
             
             // logic for clearing your orders currently 
-            if(choice.equalsIgnoreCase("CLEAR")){
+            if(choice.equalsIgnoreCase("Y")){
+                clearScreen();
                 System.out.println("Are you sure you want to clear the cart? Y/N: ");
                 String confirm = input.nextLine();
 
@@ -276,16 +281,16 @@ public class potatoCornerPOS {
                     System.out.println("  All items have been removed from your cart.");
                 }
                 else{
+                    clearScreen();
                     System.out.println("\nCancelled");
                 }
                 pauseUser(input, "press any key to continue: ");
             }
             else{
-                clearScreen();
-                pauseUser(input, "Returning to menu.....");
+                return;
             }
         }
-
+        
         public void receiptGenerator(ArrayList<OrderItem> items, Scanner input){
             
             //ito yung gumagawa ng order number
@@ -303,7 +308,13 @@ public class potatoCornerPOS {
                 pauseUser(input, "your cart is empty!\nPlease add items before checkout.");
                 return;
             }
-
+            
+            System.out.print("Enter customers name: ");
+            String name = input.nextLine();
+            
+            System.out.print("Enter customers number: ");
+            int number = input.nextInt();
+            
             double grandTotal = 0.0;
             for(int i = 0; i < items.size(); i++){
                 grandTotal += items.get(i).getItemTotal();
@@ -324,16 +335,21 @@ public class potatoCornerPOS {
                 else{
                     pauseUser(input, "invalid input!\npress any key to continue: ");
                 }
+                
             }
-
             double change = cashPaid - grandTotal;
-
+            
             //itong format mismo prini print into text file
             try (PrintWriter save = new PrintWriter(new FileOutputStream(filename))) {
                 
                 save.println("==================================================");
                 save.println("               ORDER NUMBER #" + randomNumber );
                 save.println("==================================================");
+                save.println("CUSTOMER NAME : " + name);
+                save.println("CUSTOMER NUMBER : " + number);
+                save.println( "--------------------------------------------------");
+                save.println("            PLEASE GIVE THIS RECEIPT");
+                save.println("       TO A NEARBY CASHIER FOR YOUR ORDER");
 
                 for(int i = 0; i < items.size(); i++){
                     OrderItem order = items.get(i);

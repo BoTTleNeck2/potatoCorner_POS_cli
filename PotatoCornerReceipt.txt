@@ -1,0 +1,20 @@
+==================================================
+               ORDER NUMBER #680
+==================================================
+CUSTOMER NAME : kyle
+CUSTOMER NUMBER : 50
+--------------------------------------------------
+            PLEASE GIVE THIS RECEIPT
+       TO A NEARBY CASHIER FOR YOUR ORDER
+
+ORDER #1
+1 x regular Fries
+Flavors: cheese
+Subtotal: PHP 41.00
+--------------------------------------------------
+GRAND TOTAL : PHP 41.00
+CASH PAID   : PHP 50.00
+CHANGE      : PHP 9.00
+==================================================
+          THANK YOU FOR YOUR PURCHASE!
+==================================================
