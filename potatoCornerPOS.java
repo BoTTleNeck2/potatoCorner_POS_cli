@@ -105,11 +105,11 @@ public class potatoCornerPOS {
             }
             return cashPaid;
         }
-        
+        //name validator, it prevents empty or symbol when inputting name
         private String usernameValidator(Scanner input){
             String name = "";
             while (true) { 
-                System.out.print("Emter customers name: ");
+                System.out.print("Enter customers name: ");
                 name = input.nextLine().trim();
                 
                 if(name.matches("^[a-zA-Z\\s]+$") && !name.isEmpty()){
