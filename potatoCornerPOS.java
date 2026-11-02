@@ -53,6 +53,7 @@ public class potatoCornerPOS {
                     running = false;
                     break;
                 default:
+                    use.clearScreen();
                     input.nextLine();
                     System.out.println("\nInvalid choice! Please select 1-4.");
                     use.pauseUser(input, "Press ENTER to continue...");
@@ -302,7 +303,6 @@ public class potatoCornerPOS {
         }
         // logic to view your current order
         public void viewCartLogic(ArrayList <OrderItem> items, Scanner input){
-            usefulMethods use = new usefulMethods();
             use.clearScreen();
             System.out.println("=========================================================\n");
             if (items.isEmpty()){
@@ -349,26 +349,25 @@ public class potatoCornerPOS {
             
             // logic for clearing your orders currently 
             if(choice.equalsIgnoreCase("Y")){
-                use.clearScreen();
-                System.out.println("Are you sure you want to clear the cart? Y/N: ");
+                System.out.print("Are you sure you want to clear the cart? Y/N: ");
                 String confirm = input.nextLine();
 
                 if(confirm.equalsIgnoreCase("Y")){
                     items.clear();
                     use.clearScreen();
-                    System.out.println("  All items have been removed from your cart.");
+                    System.out.println("All items have been removed from your cart.");
                 }
                 else{
                     use.clearScreen();
                     System.out.println("\nCancelled");
                 }
-                use.pauseUser(input, "press any key to continue: ");
+                use.pauseUser(input, "\npress any key to continue: ");
             }
             else{
                 return;
             }
         }
-        
+        //logic to generate receipt
         public void receiptGenerator(ArrayList<OrderItem> items, Scanner input){
             
             //ito yung gumagawa ng order number para sa receipt
@@ -413,6 +412,8 @@ public class potatoCornerPOS {
             try (PrintWriter save = new PrintWriter(new FileOutputStream(filename))) {
                 
                 save.println("==================================================");
+                save.println("                 POTATO CORNER ");
+                save.println("        WORLD'S BEST FLAVORED FRENCH FRIES\n");
                 save.println("               ORDER NUMBER #" + randomNumber );
                 save.println("==================================================");
                 save.println("            "+currentTime);
@@ -459,6 +460,5 @@ public class potatoCornerPOS {
                 use.pauseUser(input, "\nerror writing a save \npress any key: " + e.getMessage());
             }
         }
-
     }
 }
