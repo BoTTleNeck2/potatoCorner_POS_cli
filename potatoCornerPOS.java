@@ -1,5 +1,9 @@
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +18,7 @@ public class potatoCornerPOS {
         Scanner input = new Scanner(System.in);
         usefulMethods use = new usefulMethods();
         ArrayList<OrderItem> items = new ArrayList<>();
+        systemLogic render = new systemLogic();
         boolean running = true;
 
         while (running) {
@@ -34,19 +39,16 @@ public class potatoCornerPOS {
             switch (choice) {
 
                 case 1:
-                    systemLogic render = new systemLogic();
                     render.addItemToCart(input, items);
                     break;
 
                 case 2:
                     input.nextLine();
-                    systemLogic newRender = new systemLogic();
-                    newRender.viewCartLogic(items, input);
+                    render.viewCartLogic(items, input);
                     break;
 
                 case 3:
-                    systemLogic neuRender = new systemLogic();
-                    neuRender.receiptGenerator(items, input);
+                    render.receiptGenerator(items, input);
                     break;
 
                 case 4:
@@ -220,7 +222,9 @@ public class potatoCornerPOS {
     }
     
     public static class systemLogic{
+        
         usefulMethods use = new usefulMethods();
+
         // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
         public void addItemToCart(Scanner input, ArrayList<OrderItem> items){
             
@@ -346,7 +350,7 @@ public class potatoCornerPOS {
             System.out.println("================================================================");
             System.out.print("  Enter action: ");
             String choice = input.nextLine().trim();
-            
+             
             // logic for clearing your orders currently 
             if(choice.equalsIgnoreCase("Y")){
                 System.out.print("Are you sure you want to clear the cart? Y/N: ");
@@ -367,6 +371,31 @@ public class potatoCornerPOS {
                 return;
             }
         }
+        //loads saved text receipt after purchasing
+        public void loadFile(String filename,Scanner input){
+            use.clearScreen();
+            File folder = new File("output");
+
+            //checks if theres a file or not
+            if (!folder.exists() || folder.listFiles() == null || folder.listFiles().length == 0) {
+                use.clearScreen();
+                use.pauseUser(input, "No saved receipts found yet!\nPress ENTER to return...");
+                return;
+            }
+
+            // Read and display it directly on the terminal
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename)))) {
+                String line;
+                use.clearScreen();
+                while ((line = reader.readLine()) != null) {
+                    System.out.println(line);
+                }
+                use.pauseUser(input, "\nReceipt printed successfully!\nPress any KEY to return to menu...");
+
+            }catch (IOException e) {
+                use.pauseUser(input, "\nError reading file: " + e.getMessage() + "\nPress ENTER to return...");
+            }
+        }
         //logic to generate receipt
         public void receiptGenerator(ArrayList<OrderItem> items, Scanner input){
             
@@ -381,7 +410,14 @@ public class potatoCornerPOS {
             
             input.nextLine();
             use.clearScreen();
-            String filename = "PotatoCornerReceipt.txt";
+            File folder = new File("output");
+
+            // Check if the folder exists, and create it if it doesn't
+            if (!folder.exists()) {
+                folder.mkdirs(); 
+            }
+            String filename = "output/PotatoCornerReceipt.txt";
+
             System.out.println("==================================================");
             System.out.println("                   CHECKOUT                       ");
             System.out.println("==================================================\n");
@@ -453,12 +489,11 @@ public class potatoCornerPOS {
                 System.out.printf("  Change      : PHP %,.2f%n", change);
                 System.out.println("==================================================");
                 use.pauseUser(input, "\n receipt save successfully to " + filename + "\n Press any key to continue: ");
-                items.clear();
-
-
             } catch (IOException e) {
                 use.pauseUser(input, "\nerror writing a save \npress any key: " + e.getMessage());
             }
+            loadFile(filename,input);
+            items.clear();
         }
     }
 }
