@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -293,7 +293,9 @@ public class potatoCornerPOS {
             }
             OrderItem newItem = new OrderItem(sizeChoice, selectedFlavors, quantity);
             items.add(newItem);
-
+            
+            use.clearScreen();
+            input.nextLine();
             System.out.println("==================================================");
             System.out.println("                  ITEM ADDED!");
             System.out.println("==================================================");
@@ -303,7 +305,7 @@ public class potatoCornerPOS {
             System.out.println("--------------------------------------------------");
             System.out.printf("  %-12s : PHP %,.2f%n","SUBTOTAL", newItem.getItemTotal());
             System.out.println("==================================================");
-            use.pauseUser(input, "\nPress ENTER to return to menu...");
+            use.pauseUser(input, "\nPress any KEY to return to menu...");
         }
         // logic to view your current order
         public void viewCartLogic(ArrayList <OrderItem> items, Scanner input){
