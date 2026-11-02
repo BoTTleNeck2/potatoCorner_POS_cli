@@ -146,7 +146,7 @@ public class potatoCornerPOS {
         public int inputValidation(Scanner input){
             while(!input.hasNextInt()){
                 System.out.print("letters are not allowed! enter a number: ");
-                input.next();
+                input.nextLine();
             }
             return input.nextInt();
         }
