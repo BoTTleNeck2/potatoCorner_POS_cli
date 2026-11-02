@@ -286,7 +286,7 @@ public class potatoCornerPOS {
                 }
             }
 
-            System.out.print("Enter how many: ");
+            System.out.print("Enter quantity: ");
             int quantity = use.inputValidation(input);
 
             if(quantity <= 0){
