@@ -203,7 +203,7 @@ public class potatoCornerPOS {
             return 0.0;
         }
         
-        // this 3 methods (getItemtotal, getSize, getQuantity) will be used for view cart :)
+        // this 3 methods (getItemtotal, getSize, getQuantity) will be used for systemLogic class :)
         public double getItemTotal(){
             return itemTotal;
         }
@@ -228,6 +228,7 @@ public class potatoCornerPOS {
         // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
         public void addItemToCart(Scanner input, ArrayList<OrderItem> items){
             
+            //arrays for menu
             String[] sizes = {"regular", "large", "jumbo", "mega", "giga", "tera"};
             String[] flavors = {"cheese","chili cheese", "barbecue", "sour cream", "chili BBQ", "golden sweet corn", "white cheedar", "wasabi", "truffle"};
             double[] sizePrices = {41.0, 67.0, 97.0, 127.0, 198.0, 228.0};
@@ -251,6 +252,7 @@ public class potatoCornerPOS {
             }
             String sizeChoice = sizes[Choice - 1];
             
+            //sets flavor limit, if regular, large only 1 flavor, 2 flavors for jumbo and mega, 3 flavors for giga and tera
             int flavorLimit = 1;
             String upperSize = sizeChoice.toUpperCase();
             if(upperSize.equals ("JUMBO") || upperSize.equals("MEGA")){
@@ -353,7 +355,7 @@ public class potatoCornerPOS {
             System.out.print("  Enter action: ");
             String choice = input.nextLine().trim();
              
-            // logic for clearing your orders currently 
+            // logic for clearing your current orders 
             if(choice.equalsIgnoreCase("Y")){
                 System.out.print("Are you sure you want to clear the cart? Y/N: ");
                 String confirm = input.nextLine();
@@ -429,14 +431,17 @@ public class potatoCornerPOS {
                 return;
             }
             
+            //calls the validator methods from helpful method class
             String userName = use.usernameValidator(input);
             String number = use.numberLimitValidator(input);
             
+            //sets a starting number for grandTotal and to calculate for receipt
             double grandTotal = 0.0;
             for(int i = 0; i < items.size(); i++){
                 grandTotal += items.get(i).getItemTotal();
             }
             
+            //calls the discount logic from helpful method class
             double[] discount = use.applyDiscount(grandTotal, input);
             grandTotal = discount[0];
             double discountAmount = discount[1];
@@ -495,6 +500,7 @@ public class potatoCornerPOS {
                 use.pauseUser(input, "\nerror writing a save \npress any key: " + e.getMessage());
             }
             loadFile(filename,input);
+            // it clears ordered items after payment and printing the receipt so user order new
             items.clear();
         }
     }
