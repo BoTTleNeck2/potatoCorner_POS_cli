@@ -25,7 +25,7 @@ public class potatoCornerPOS {
 
             use.clearScreen();
             System.out.println("==================================================");
-            System.out.println("            POTATO CORN ORDERING SYSTEM           ");
+            System.out.println("            POTATO CORNER ORDERING SYSTEM           ");
             System.out.println("==================================================");
             System.out.println("  [1] Order / Add Item");
             System.out.println("  [2] View Cart");
