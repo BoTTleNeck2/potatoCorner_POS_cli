@@ -185,17 +185,54 @@ public class potatoCornerPOS {
             
             switch(size.toUpperCase()){
                 case "REGULAR":
-                    return 41.0;
+                    return 45.0;
                 case "LARGE":
-                    return 67.0;
+                    return 70.0;
                 case "JUMBO":
-                    return 97.0;
+                    return 99.0;
                 case "MEGA":
-                    return 127.0;
+                    return 130.0;
                 case "GIGA":
-                    return 198.0;
+                    return 205.0;
                 case "TERA":
-                    return 228.0;
+                    return 235.0;
+                    
+                // Loopys
+                case "LOOPYS LARGE":
+                    return 75.0;
+                case "LOOPYS MEGA":
+                    return 135.0;
+                    
+                // Crunchy Chicken Pops
+                case "CHICKEN POPS REGULAR":
+                    return 79.0;
+                case "CHICKEN POPS LARGE":
+                    return 99.0;
+                case "CHICKEN POPS MEGA":
+                    return 199.0;
+                    
+                // Chicken Fries
+                case "CHICKEN FRIES LARGE":
+                    return 99.0;
+                case "CHICKEN FRIES MEGA":
+                    return 199.0;
+                    
+                // Mix & Max Combos
+                case "LARGE MIX":
+                    return 99.0;
+                case "MEGA MIX":
+                    return 149.0;
+                case "TERA MIX":
+                    return 259.0;
+                    
+                // Drinks & Coolers
+                case "BOTTLED WATER":
+                    return 25.0;
+                case "SODA - COKE":
+                case "SODA - SPRITE":
+                    return 55.0;
+                case "POP COOLERS":
+                    return 65.0;
                 default:
                     System.out.println("UNKNOWN SIZE!");
             }
@@ -227,85 +264,198 @@ public class potatoCornerPOS {
 
         // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
         public void addItemToCart(Scanner input, ArrayList<OrderItem> items){
-            
-            //arrays for menu
-            String[] sizes = {"regular", "large", "jumbo", "mega", "giga", "tera"};
-            String[] flavors = {"cheese","chili cheese", "barbecue", "sour cream", "chili BBQ", "golden sweet corn", "white cheedar", "wasabi", "truffle"};
-            double[] sizePrices = {41.0, 67.0, 97.0, 127.0, 198.0, 228.0};
-
+    
+            // 1. Category Selection
             use.clearScreen();
             System.out.println("==================================================");
-            System.out.println("                ORDER POTATO FRIES                ");
+            System.out.println("                  SELECT CATEGORY                 ");
             System.out.println("==================================================");
-            System.out.printf("%-5s %-20s %12s%n","NO.", "SIZE", "PRICE");
+            System.out.println("  [1] Flavored Fries");
+            System.out.println("  [2] Loopys");
+            System.out.println("  [3] Crunchy Chicken Pops");
+            System.out.println("  [4] Chicken Fries");
+            System.out.println("  [5] Mix & Max Combos");
+            System.out.println("  [6] Drinks");
+            System.out.println("==================================================");
+            System.out.print("  Enter category choice: ");
+            int category = use.inputValidation(input);
+            input.nextLine(); // Clear buffer
+
+            // Common Flavors array used across food items
+            String[] flavors = {"Cheese", "Chili Cheese", "Barbecue", "Sour Cream", "Chili BBQ", "Golden Sweet Corn", "White Cheddar", "Wasabi", "Truffle"};
+            String[] itemsList = null;
+            double[] prices = null;
+            String categoryName = "";
+            String selectedItemName = "";
+            double selectedPrice = 0.0;
+            boolean requiresFlavors = true;
+
+            //setup items
+            switch(category) {
+                case 1:
+                    categoryName = "Flavored Fries";
+                    itemsList = new String[]{"Regular", "Large", "Jumbo", "Mega", "Giga", "Tera"};
+                    prices = new double[]{45.0, 70.0, 99.0, 130.0, 205.0, 235.0};
+                    break;
+                case 2:
+                    categoryName = "Loopys";
+                    itemsList = new String[]{"Loopys Large", "Loopys Mega"};
+                    prices = new double[]{75.0, 135.0};
+                    break;
+                case 3:
+                    categoryName = "Crunchy Chicken Pops";
+                    itemsList = new String[]{"Chicken Pops Regular", "Chicken Pops Large", "Chicken Pops Mega"};
+                    prices = new double[]{79.0, 99.0, 199.0};
+                    break;
+                case 4:
+                    categoryName = "Chicken Fries";
+                    itemsList = new String[]{"Chicken Fries Large", "Chicken Fries Mega"};
+                    prices = new double[]{99.0, 199.0};
+                    break;
+                case 5:
+                    categoryName = "Mix & Max Combos";
+                    itemsList = new String[]{"Large Mix", "Mega Mix", "Tera Mix"};
+                    prices = new double[]{99.0, 149.0, 259.0};
+                    break;
+                case 6:
+                    categoryName = "Drinks & Coolers";
+                    use.clearScreen();
+                    System.out.println("==================================================");
+                    System.out.println("                 DRINKS & COOLERS                 ");
+                    System.out.println("==================================================");
+                    System.out.println("  [1] Soda - Coke");
+                    System.out.println("  [2] Soda - Sprite");
+                    System.out.println("  [3] Pop Coolers");
+                    System.out.println("  [4] Bottled Water");
+                    System.out.println("==================================================");
+                    System.out.print("  Select drink number: ");
+                    int drinkChoice = use.inputValidation(input);
+                    input.nextLine();
+
+                    if (drinkChoice == 1) {
+                        itemsList = new String[]{"Soda - Coke"};
+                        prices = new double[]{55.0};
+                    } 
+                    else if (drinkChoice == 2) {
+                        itemsList = new String[]{"Soda - Sprite"};
+                        prices = new double[]{55.0};
+                    } 
+                    else if (drinkChoice == 3 || drinkChoice == 3) { // handles Pop Coolers or direct choice
+                        itemsList = new String[]{"Pop Coolers"};
+                        prices = new double[]{65.0};
+                    } 
+                    else if (drinkChoice == 4) {
+                        itemsList = new String[]{"Bottled Water"};
+                        prices = new double[]{25.0};
+                    } 
+                    else {
+                        use.pauseUser(input, "\nInvalid selection!\nPress any key to return...");
+                        return;
+                    }
+                    requiresFlavors = false; // Drinks dont need flavor loops
+                    break;
+                default:
+                    use.pauseUser(input, "\nInvalid category!\nPress any key to return...");
+                    return;
+            }
+
+            //DISPLAY MENU FOR CHOSEN CATEGORY
+            use.clearScreen();
+            System.out.println("==================================================");
+            System.out.println("            ORDER " + categoryName.toUpperCase() + "          ");
+            System.out.println("==================================================");
+            System.out.printf("%-5s %-25s %12s%n","NO.", "ITEM / SIZE", "PRICE");
             System.out.println("--------------------------------------------------");
-            for(int i = 0; i < sizes.length; i++){
-                System.out.printf("%-5d %-20s PHP %8.2f%n",i + 1, sizes[i], sizePrices[i]);
+            for(int i = 0; i < itemsList.length; i++){
+                System.out.printf("%-5d %-25s PHP %8.2f%n", i + 1, itemsList[i], prices[i]);
             }
             System.out.println("==================================================");
-            System.out.print("Select sizes: ");
-            int Choice = use.inputValidation(input);
+            System.out.print("Select item number: ");
+            int choice = use.inputValidation(input);
             input.nextLine();
-            if(Choice < 1 || Choice > sizes.length){
-                use.pauseUser(input, "\nInvalid size!\nPress any key to return...");
+
+            if(choice < 1 || choice > itemsList.length){
+                use.pauseUser(input, "\nInvalid selection!\nPress any key to return...");
                 return;
             }
-            String sizeChoice = sizes[Choice - 1];
-            
-            //sets flavor limit, if regular, large only 1 flavor, 2 flavors for jumbo and mega, 3 flavors for giga and tera
+
+            selectedItemName = itemsList[choice - 1];
+            selectedPrice = prices[choice - 1];
+
+            // DETERMINE FLAVOR LIMIT
             int flavorLimit = 1;
-            String upperSize = sizeChoice.toUpperCase();
-            if(upperSize.equals ("JUMBO") || upperSize.equals("MEGA")){
+            String upperName = selectedItemName.toUpperCase();
+            
+            // Set limits based on size name (Mega/Giga/Mega Mix = 2 flavors, Tera/Tera Mix = 3 flavors)
+            if(upperName.contains("MEGA") || upperName.contains("GIGA") || upperName.contains("MEGA MIX")){
                 flavorLimit = 2;
             }
-            else if(upperSize.equals("GIGA") || upperSize.equals("TERA")){
+            else if(upperName.contains("TERA") || upperName.contains("TERA MIX")){
                 flavorLimit = 3;
             }
-            use.clearScreen();
-            System.out.println("Selected Size : " + Choice);
-            System.out.printf("Price         : PHP %,.2f%n", sizePrices[Choice - 1]);
-            System.out.println("Flavor Limit  : " + flavorLimit);
-
-            List<String> selectedFlavors = new ArrayList<>();
-            for(int f = 1; f <= flavorLimit; f++){
-                System.out.println("--------------------------------------------------");
-                System.out.println(" CHOOSE FLAVOR " + f + " OF " + flavorLimit           );
-                System.out.println("--------------------------------------------------");
-                for(int i = 0; i < flavors.length; i++){
-                    System.out.printf("  [%d] %s%n", i + 1, flavors[i]);
-                }
-                System.out.print("Select flavor number: ");
-                int flavorSelected = use.inputValidation(input);
-
-                if(flavorSelected >= 1 && flavorSelected <= flavors.length){
-                    selectedFlavors.add(flavors[flavorSelected - 1]);
-                }
-                else{
-                    System.out.println("invalid flavor!");
-                    f--;
-                }
+            // Drinks override
+            if(!requiresFlavors){
+                flavorLimit = 0;
             }
 
+            // --- GET QUANTITY FIRST ---
             System.out.print("Enter quantity: ");
             int quantity = use.inputValidation(input);
+            input.nextLine();
 
             if(quantity <= 0){
-                use.pauseUser(input, "there must be atleast 1 order. setting quantity to 1");
+                use.pauseUser(input, "There must be at least 1 order. Setting quantity to 1");
                 quantity = 1;
             }
-            OrderItem newItem = new OrderItem(sizeChoice, selectedFlavors, quantity);
-            items.add(newItem);
-            
+
+            double totalAddedPrice = 0.0;
+
+            // LOOP THROUGH EACH PACK FOR INDEPENDENT FLAVOR CONFIGURATION
+            for(int i = 1; i <= quantity; i++){
+                List<String> selectedFlavors = new ArrayList<>();
+
+                if(requiresFlavors){
+                    for (int f = 1; f <= flavorLimit; f++) {
+                        use.clearScreen();
+                        System.out.println("==================================================");
+                        System.out.println("   CONFIGURING " + selectedItemName + " (Pack " + i + "/" + quantity + ")   ");
+                        System.out.println("==================================================");
+                        System.out.println("Flavor Limit : Choose " + flavorLimit + " flavor(s) total");
+                        System.out.println("--------------------------------------------------");
+                        System.out.println(" CHOOSE FLAVOR " + f + " OF " + flavorLimit          );
+                        System.out.println("--------------------------------------------------");
+                        for(int j = 0; j < flavors.length; j++){
+                            System.out.printf("  [%d] %s%n", j + 1, flavors[j]);
+                        }
+                        System.out.print("Select flavor number: ");
+                        int flavorSelected = use.inputValidation(input);
+                        input.nextLine();
+                        
+                        if(flavorSelected >= 1 && flavorSelected <= flavors.length){
+                            selectedFlavors.add(flavors[flavorSelected - 1]);
+                        }
+                        else{
+                            System.out.println("Invalid flavor!");
+                            f--; // Retry this flavor slot
+                        }
+                    }
+                } else {
+                    selectedFlavors.add("N/A");
+                }
+
+                // Create independent item with quantity = 1 for this individual pack
+                OrderItem newItem = new OrderItem(selectedItemName, selectedFlavors, 1);
+                items.add(newItem);
+                totalAddedPrice += newItem.getItemTotal();
+            }
             use.clearScreen();
-            input.nextLine();
             System.out.println("==================================================");
-            System.out.println("                  ITEM ADDED!");
+            System.out.println("                    ITEM ADDED!                   ");
             System.out.println("==================================================");
-            System.out.printf("  %-12s : %s%n", "Size", Choice);
-            System.out.printf("  %-12s : %s%n","Flavors", String.join(", ", selectedFlavors));
+            System.out.printf("  %-12s : %s%n", "Item", selectedItemName);
             System.out.printf("  %-12s : %d%n", "Quantity", quantity);
             System.out.println("--------------------------------------------------");
-            System.out.printf("  %-12s : PHP %,.2f%n","SUBTOTAL", newItem.getItemTotal());
+            System.out.printf("  %-12s : PHP %,.2f%n","TOTAL ADDED", totalAddedPrice);
             System.out.println("==================================================");
             use.pauseUser(input, "\nPress any KEY to return to menu...");
         }
