@@ -71,17 +71,19 @@ public class potatoCornerPOS {
         //discount logic
         private double[] applyDiscount(double grandTotal, Scanner input){
             double discountAmount = 0.0;
-            double discountPercent = 50.0;
+            double discountPercent = 20.0;
             
-            System.out.print("are senior citizen/PWD? (Y/N): ");
+            System.out.print("are you senior PWD? (Y/N): ");
             String yesiWantDiscount = input.nextLine();
             
             if(yesiWantDiscount.equalsIgnoreCase("Y")){
                 discountAmount = grandTotal * (discountPercent/ 100.0);
                 grandTotal -= discountAmount;
-                System.out.println("\n50% Discount successfully applied!");
+                clearScreen();
+                System.out.println("\n20% Discount successfully applied!");
             }
             else{
+                clearScreen();
                 discountPercent = 0.0;
                 System.out.println("\nno discount applied!");
             }
@@ -90,23 +92,76 @@ public class potatoCornerPOS {
         }
         
         //payment logic in checkout
-        private double paymentProcess(double grandTotal, Scanner input){
+        private Object[] paymentProcess(double grandTotal, Scanner input){
             double cashPaid = 0.0;
-            while(cashPaid < grandTotal){
-                System.out.print("\nEnter cash amount: ");
-                if(input.hasNextDouble()){
-                    cashPaid = input.nextDouble();   
-                    if(cashPaid < grandTotal){
-                        System.out.printf( "Insufficent amount! need P%.2f", (grandTotal - cashPaid));
-                    }
-                }
-                else{
-                    input.nextLine();
-                    System.out.println("\ninvalid input! \nplease enter your payment");
-                }
+            String paymentMethod = "";
+            while(true){
+                System.out.println("\n====================================");
+                System.out.println("          SELECT PAYMENT METHOD     ");
+                System.out.println("====================================");
+                System.out.println("  [1] Cash");
+                System.out.println("  [2] GCash (E-Wallet)");
+                System.out.println("====================================");
+                System.out.print("  Enter payment choice: ");
                 
+                int payChoice = inputValidation(input);
+                input.nextLine();
+                
+                if(payChoice == 1){
+                    paymentMethod = "Cash";
+                    while(cashPaid < grandTotal){
+                        System.out.print("\nEnter cash amount: ");
+                        if(input.hasNextDouble()){
+                            cashPaid = input.nextDouble();   
+                            if(cashPaid < grandTotal){
+                                System.out.printf( "Insufficent amount! need P%.2f", (grandTotal - cashPaid));
+                            }
+                        }
+                        else{
+                            input.nextLine();
+                            System.out.println("\ninvalid input! \nplease enter your payment");
+                        }
+                    }
+                    input.nextLine();
+                    break;
+                }
+                else if(payChoice == 2){
+                    paymentMethod = "GCash";
+                    System.out.println("\n------------------------------------");
+                    System.out.println("          GCASH EXPRESS PAY         ");
+                    System.out.println("------------------------------------");
+                    
+                    // Validate Philippine GCash Number (Starts with 09 and has 11 digits total)
+                    String gcashNumber = customValidator(input, "Enter GCash Mobile Number (09XXXXXXXXX): ", "^09\\d{9}$", "Invalid GCash number! Must be 11 digits and start with '09'.");
+                    
+                    // Validate 4-digit MPIN
+                    String mpin = customValidator(input, "Enter 4-digit MPIN: ", "^\\d{4}$", "Invalid MPIN! Must be exactly 4 digits.");
+                    
+                    //transaction successfull
+                    System.out.println("\nProcessing GCash payment...");
+                    try {
+                        Thread.sleep(1500); // Small realistic delay effect
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    
+                    cashPaid = grandTotal; // Exact amount paid via e-wallet
+                    clearScreen();
+                    System.out.println("====================================");
+                    System.out.println("       GCASH PAYMENT SUMMARY     ");
+                    System.out.println("====================================");
+                    System.out.printf("  Mobile No : %s%n", gcashNumber);
+                    System.out.printf("  Amount    : PHP %,.2f%n", grandTotal);
+                    System.out.println("  Reference : REF-" + (int)(Math.random() * 900000 + 100000));
+                    System.out.println("====================================");
+                    pauseUser(input,"\nPress any key to continue to receipt...");
+                    break;
+                }
+                else {
+                    System.out.println("Invalid payment option! Please choose 1 or 2.");
+                }
             }
-            return cashPaid;
+            return new Object[] { cashPaid, paymentMethod };
         }
         //name validator, it prevents empty or symbol when inputting name
         private String usernameValidator(Scanner input){
@@ -124,24 +179,20 @@ public class potatoCornerPOS {
             }
             return name;
         }
-        
-        //catches usernumbers input and validate whether it is 12 digit or not (will be also used in checkout)
-        private String numberLimitValidator(Scanner input){
-            String PhoneNumber = "";
+        //flexible number limit validator
+        private String customValidator(Scanner input, String prompt, String regex, String errorMessage){
+            String result = "";
             while(true){
-                System.out.print("Enter contact number (12 digits only): ");
-                PhoneNumber = input.nextLine().trim();
-    
-                if(PhoneNumber.matches("^\\d{12}$")){
+                System.out.print(prompt);
+                result = input.nextLine().trim();
+                if(result.matches(regex)){
                     break;
-                }
-                else{
-                    System.out.println("invalid input! please enter 12 digits number!");
+                } else {
+                    System.out.println(errorMessage);
                 }
             }
-            return PhoneNumber;
+            return result;
         }
-        
         // basically a method for input validation so para ma catch pag letter or symbol yung input at hindi mag crash
         public int inputValidation(Scanner input){
             while(!input.hasNextInt()){
@@ -150,13 +201,11 @@ public class potatoCornerPOS {
             }
             return input.nextInt();
         }
-        
         // it clears text
         public void clearScreen() {
             System.out.print("\033[H\033[2J");
             System.out.flush();
         }
-        
         // nextline method so it wont immediately goes to menu unless user press something to continue
         public void pauseUser(Scanner input,String message){
             System.out.print(message); 
@@ -583,7 +632,7 @@ public class potatoCornerPOS {
             
             //calls the validator methods from helpful method class
             String userName = use.usernameValidator(input);
-            String number = use.numberLimitValidator(input);
+            String number = use.customValidator(input, "Enter contact number (11 digits): ", "^\\d{11}$", "Invalid input! Please enter 11 digits.");
             
             //sets a starting number for grandTotal and to calculate for receipt
             double grandTotal = 0.0;
@@ -598,7 +647,9 @@ public class potatoCornerPOS {
             double discountPercent = discount[2];
 
             System.out.printf("\nGrand total to pay: " + grandTotal);
-            double cashPaid = use.paymentProcess(grandTotal, input);
+            Object[] paymentResult = use.paymentProcess(grandTotal, input);
+            double cashPaid = (double) paymentResult[0];
+            String paymentMethod = (String) paymentResult[1];
             double change = cashPaid - grandTotal;
             
             //itong format mismo prini print into text file
@@ -629,6 +680,7 @@ public class potatoCornerPOS {
                     save.printf("DISCOUNT (%.0f%%) : -PHP %,.2f%n", discountPercent, discountAmount);
                 }
                 save.printf("GRAND TOTAL : PHP %,.2f%n", grandTotal);
+                save.printf("PAYMENT TYPE: %s%n", paymentMethod);
                 save.printf("CASH PAID   : PHP %,.2f%n", cashPaid);
                 save.printf("CHANGE      : PHP %,.2f%n", change);
 
@@ -637,7 +689,6 @@ public class potatoCornerPOS {
                 save.println("==================================================");
                 
                 use.clearScreen();
-                input.nextLine();
                 System.out.println("==================================================");
                 System.out.println("                PAYMENT SUCCESSFUL");
                 System.out.println("==================================================");
