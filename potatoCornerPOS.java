@@ -68,39 +68,16 @@ public class potatoCornerPOS {
     }
     
     public static class usefulMethods{    
-        //discount logic
-        private double[] applyDiscount(double grandTotal, Scanner input){
-            double discountAmount = 0.0;
-            double discountPercent = 20.0;
-            
-            System.out.print("are you senior PWD? (Y/N): ");
-            String yesiWantDiscount = input.nextLine();
-            
-            if(yesiWantDiscount.equalsIgnoreCase("Y")){
-                discountAmount = grandTotal * (discountPercent/ 100.0);
-                grandTotal -= discountAmount;
-                clearScreen();
-                System.out.println("\n20% Discount successfully applied!");
-            }
-            else{
-                clearScreen();
-                discountPercent = 0.0;
-                System.out.println("\nno discount applied!");
-            }
-            System.out.println("--------------------------------------");
-            return new double[] { grandTotal, discountAmount , discountPercent };
-        }
-        
         //payment logic in checkout
         private Object[] paymentProcess(double grandTotal, Scanner input){
             double cashPaid = 0.0;
             String paymentMethod = "";
             while(true){
-                System.out.println("\n====================================");
-                System.out.println("          SELECT PAYMENT METHOD     ");
-                System.out.println("====================================");
+                System.out.println(" SELECT PAYMENT METHOD     ");
+                System.out.println("------------------------------------");
                 System.out.println("  [1] Cash");
-                System.out.println("  [2] GCash (E-Wallet)");
+                System.out.println("  [2] QR ph");
+                System.out.println("  [3] Credit / Debit Card");
                 System.out.println("====================================");
                 System.out.print("  Enter payment choice: ");
                 
@@ -125,40 +102,68 @@ public class potatoCornerPOS {
                     input.nextLine();
                     break;
                 }
+            
                 else if(payChoice == 2){
-                    paymentMethod = "GCash";
+                    paymentMethod = "QR Ph";
                     System.out.println("\n------------------------------------");
-                    System.out.println("          GCASH EXPRESS PAY         ");
+                    System.out.println("            QR PH PAYMENT           ");
                     System.out.println("------------------------------------");
+                    // ASCII Art Mockup for a QR Code Terminal Display
+                    System.out.println("      ╔══════════════════════╗      ");
+                    System.out.println("      ║  ███████  ▄█  ███████║      ");
+                    System.out.println("      ║  █ ▄▄▄ █  █▀█  █ ▄▄▄ █║      ");
+                    System.out.println("      ║  █ █▄█ █  ▀▀▄  █ █▄█ █║      ");
+                    System.out.println("      ║  ▀▀▀▀▀▀▀  ▀ ▀  ▀▀▀▀▀▀▀║      ");
+                    System.out.println("      ║    [!] SCAN ME !      ║      ");
+                    System.out.println("      ╚══════════════════════╝      ");
+                    System.out.println("------------------------------------");
+                    System.out.println("Supported: Gcash, Maya, InstaPay, etc.");
                     
-                    // Validate Philippine GCash Number (Starts with 09 and has 11 digits total)
-                    String gcashNumber = customValidator(input, "Enter GCash Mobile Number (09XXXXXXXXX): ", "^09\\d{9}$", "Invalid GCash number! Must be 11 digits and start with '09'.");
+                    // Validate 10-digit transaction reference number from their banking app
+                    String qrRef = customValidator(input, "Enter 10-digit Transfer Ref No: ", "^\\d{10}$", "Invalid Reference! Must be a 10-digit transaction code.");
                     
-                    // Validate 4-digit MPIN
-                    String mpin = customValidator(input, "Enter 4-digit MPIN: ", "^\\d{4}$", "Invalid MPIN! Must be exactly 4 digits.");
+                    processPaymentAnimation("Validating QR Ph transfer...");
                     
-                    //transaction successfull
-                    System.out.println("\nProcessing GCash payment...");
-                    try {
-                        Thread.sleep(1500); // Small realistic delay effect
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                    
-                    cashPaid = grandTotal; // Exact amount paid via e-wallet
+                    cashPaid = grandTotal; 
                     clearScreen();
                     System.out.println("====================================");
-                    System.out.println("       GCASH PAYMENT SUMMARY     ");
+                    System.out.println("        QR PH PAYMENT SUMMARY       ");
                     System.out.println("====================================");
-                    System.out.printf("  Mobile No : %s%n", gcashNumber);
                     System.out.printf("  Amount    : PHP %,.2f%n", grandTotal);
-                    System.out.println("  Reference : REF-" + (int)(Math.random() * 900000 + 100000));
+                    System.out.printf("  Ref Code  : QRPH-%s%n", qrRef);
+                    System.out.println("====================================");
+                    pauseUser(input,"\nPress any key to continue to receipt...");
+                    break;
+                }
+                else if(payChoice == 3){
+                    paymentMethod = "Credit/Debit Card";
+                    System.out.println("\n------------------------------------");
+                    System.out.println("         CARD TERMINAL (POS)        ");
+                    System.out.println("------------------------------------");
+                    System.out.println("[!] Insert, Swipe, or Tap Card...");
+                    
+                    // Validate simulated 16-digit card number (or last 4 digits for simplicity, e.g., 4 digits)
+                    String cardLast4 = customValidator(input, "Enter Last 4 Digits of Card: ", "^\\d{4}$", "Invalid! Must enter exactly the last 4 digits.");
+                    
+                    // Validate 4-digit Card PIN / Authorization
+                    String cardPin = customValidator(input, "Enter 4-digit Card PIN: ", "^\\d{4}$", "Invalid PIN! Must be 4 digits.");
+                    
+                    processPaymentAnimation("Connecting to bank network & authorizing...");
+                    
+                    cashPaid = grandTotal; 
+                    clearScreen();
+                    System.out.println("====================================");
+                    System.out.println("        CARD PAYMENT SUMMARY        ");
+                    System.out.println("====================================");
+                    System.out.printf("  Card Used : ****-****-****-%s%n", cardLast4);
+                    System.out.printf("  Amount    : PHP %,.2f%n", grandTotal);
+                    System.out.println("  Approval  : APPR-" + (int)(Math.random() * 900000 + 100000));
                     System.out.println("====================================");
                     pauseUser(input,"\nPress any key to continue to receipt...");
                     break;
                 }
                 else {
-                    System.out.println("Invalid payment option! Please choose 1 or 2.");
+                    System.out.println("Invalid payment option! Please choose 1 to 4.");
                 }
             }
             return new Object[] { cashPaid, paymentMethod };
@@ -210,6 +215,15 @@ public class potatoCornerPOS {
         public void pauseUser(Scanner input,String message){
             System.out.print(message); 
             input.nextLine();
+        }
+        //animation for payment process
+        private void processPaymentAnimation(String message) {
+            System.out.println("\n" + message);
+            try {
+                Thread.sleep(1500); 
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
     
@@ -273,6 +287,17 @@ public class potatoCornerPOS {
                     return 149.0;
                 case "TERA MIX":
                     return 259.0;
+                //loaded fries
+                case "LOADED FRIES(UMAMI BBQ)":
+                case "LOADED FRIES(CHICKEN HAM O' CHEESE)":
+                case "LOADED FRIES(TRUFFLE PARMESAN)":
+                    return 159.0;
+                
+                //friescream
+                case "FRIESCREAM(REGULAR)":
+                    return 89.0;
+                case "FRIESCREAM(LARGE)":
+                    return 159.0;
                     
                 // Drinks & Coolers
                 case "BOTTLED WATER":
@@ -282,6 +307,14 @@ public class potatoCornerPOS {
                     return 55.0;
                 case "POP COOLERS":
                     return 65.0;
+                    
+                // Add-ons & Extras
+                case "EXTRA FLAVOR POWDER":
+                    return 15.0;
+                case "CHEESE DIP":
+                    return 25.0;
+                case "EXTRA SAUCE":
+                    return 10.0;
                 default:
                     System.out.println("UNKNOWN SIZE!");
             }
@@ -308,9 +341,7 @@ public class potatoCornerPOS {
     }
     
     public static class systemLogic{
-        
         usefulMethods use = new usefulMethods();
-
         // this an acutal ordering logic, from choosing size, flavors and quantity, this is where it all happens.
         public void addItemToCart(Scanner input, ArrayList<OrderItem> items){
     
@@ -324,7 +355,11 @@ public class potatoCornerPOS {
             System.out.println("  [3] Crunchy Chicken Pops");
             System.out.println("  [4] Chicken Fries");
             System.out.println("  [5] Mix & Max Combos");
-            System.out.println("  [6] Drinks");
+            System.out.println("  [6] Loaded Fries");
+            System.out.println("  [7] Friescream");
+            System.out.println("  [8] Drinks");
+            System.out.println("  [9] Add-ons & Extras");
+            System.out.println("  [0] Return to Menu");
             System.out.println("==================================================");
             System.out.print("  Enter category choice: ");
             int category = use.inputValidation(input);
@@ -357,7 +392,7 @@ public class potatoCornerPOS {
                     prices = new double[]{79.0, 99.0, 199.0};
                     break;
                 case 4:
-                    categoryName = "Chicken Fries";
+                    categoryName = "Chicken Fries / free korean soy sauce";
                     itemsList = new String[]{"Chicken Fries Large", "Chicken Fries Mega"};
                     prices = new double[]{99.0, 199.0};
                     break;
@@ -367,6 +402,18 @@ public class potatoCornerPOS {
                     prices = new double[]{99.0, 149.0, 259.0};
                     break;
                 case 6:
+                    categoryName = "LOADED FRIES FLAVOR";
+                    itemsList = new String[]{"LOADED FRIES(UMAMI BBQ)","LOADED FRIES(CHICKEN HAM O' CHEESE)", "LOADED FRIES(TRUFFLE PARMESAN)" };
+                    prices = new double[]{159.0, 159.0, 159.0};
+                    requiresFlavors = false;
+                    break;
+                case 7:
+                    categoryName = "Friescream Sizes";
+                    itemsList = new String[]{"Friescream(Regular)", "Friescream(Large)"};
+                    prices = new double[]{89.0, 159.0};
+                    requiresFlavors = false;
+                    break;
+                case 8:
                     categoryName = "Drinks & Coolers";
                     use.clearScreen();
                     System.out.println("==================================================");
@@ -403,6 +450,14 @@ public class potatoCornerPOS {
                     }
                     requiresFlavors = false; // Drinks dont need flavor loops
                     break;
+                case 9:
+                    categoryName = "Add-ons & Extras";
+                    itemsList = new String[]{"Extra Flavor Powder", "Cheese Dip", "Extra Sauce"};
+                    prices = new double[]{15.0, 25.0, 10.0};
+                    requiresFlavors = false; // Add-ons don't need flavor loops
+                    break;
+                case 0:
+                    return;
                 default:
                     use.pauseUser(input, "\nInvalid category!\nPress any key to return...");
                     return;
@@ -410,24 +465,27 @@ public class potatoCornerPOS {
 
             //DISPLAY MENU FOR CHOSEN CATEGORY
             use.clearScreen();
-            System.out.println("==================================================");
-            System.out.println("            ORDER " + categoryName.toUpperCase() + "          ");
-            System.out.println("==================================================");
-            System.out.printf("%-5s %-25s %12s%n","NO.", "ITEM / SIZE", "PRICE");
-            System.out.println("--------------------------------------------------");
+            System.out.println("============================================================");
+            System.out.println("               >> " + categoryName.toUpperCase() + " <<               ");
+            System.out.println("============================================================");
+            System.out.printf("%-5s %-35s %15s%n", "NO.", "ITEM / SIZE", "PRICE");
+            System.out.println("------------------------------------------------------------");
             for(int i = 0; i < itemsList.length; i++){
-                System.out.printf("%-5d %-25s PHP %8.2f%n", i + 1, itemsList[i], prices[i]);
+                System.out.printf("%-5d %-35s PHP %10.2f%n", i + 1, itemsList[i], prices[i]);
             }
-            System.out.println("==================================================");
+            System.out.println("============================================================");
+            System.out.println("Type 0 to go back menu");
             System.out.print("Select item number: ");
             int choice = use.inputValidation(input);
             input.nextLine();
-
+            
+            if(choice == 0){
+                return;
+            }
             if(choice < 1 || choice > itemsList.length){
                 use.pauseUser(input, "\nInvalid selection!\nPress any key to return...");
                 return;
             }
-
             selectedItemName = itemsList[choice - 1];
             selectedPrice = prices[choice - 1];
 
@@ -453,8 +511,8 @@ public class potatoCornerPOS {
             input.nextLine();
 
             if(quantity <= 0){
-                use.pauseUser(input, "There must be at least 1 order. Setting quantity to 1");
-                quantity = 1;
+                use.pauseUser(input, "\nOrder cancelled! Returning to menu...\nPress any key to continue...");
+                return; // Exits the method and safely returns to the main menu
             }
 
             double totalAddedPrice = 0.0;
@@ -602,11 +660,9 @@ public class potatoCornerPOS {
         //logic to generate receipt
         public void receiptGenerator(ArrayList<OrderItem> items, Scanner input){
             
-            //ito yung gumagawa ng order number para sa receipt
             Random orderTicket = new Random(); 
             int randomNumber = orderTicket.nextInt(999);
             
-            //eto naman is for date and time ng inorder sa receipt
             LocalDateTime time = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a");
             String currentTime = time.format(formatter);
@@ -615,7 +671,6 @@ public class potatoCornerPOS {
             use.clearScreen();
             File folder = new File("output");
 
-            // Check if the folder exists, and create it if it doesn't
             if (!folder.exists()) {
                 folder.mkdirs(); 
             }
@@ -625,34 +680,94 @@ public class potatoCornerPOS {
             System.out.println("                   CHECKOUT                       ");
             System.out.println("==================================================\n");
             if(items.isEmpty()){
-                
                 use.pauseUser(input, "your cart is empty!\nPlease add items before checkout.");
                 return;
             }
             
-            //calls the validator methods from helpful method class
             String userName = use.usernameValidator(input);
             String number = use.customValidator(input, "Enter contact number (11 digits): ", "^\\d{11}$", "Invalid input! Please enter 11 digits.");
             
-            //sets a starting number for grandTotal and to calculate for receipt
-            double grandTotal = 0.0;
-            for(int i = 0; i < items.size(); i++){
-                grandTotal += items.get(i).getItemTotal();
-            }
+            // PWD Check
+            boolean isPWD = false;
+            String pwdIdNumber = "";
             
-            //calls the discount logic from helpful method class
-            double[] discount = use.applyDiscount(grandTotal, input);
-            grandTotal = discount[0];
-            double discountAmount = discount[1];
-            double discountPercent = discount[2];
+            while(true){
+                System.out.print("Are you a PWD? (Y/N): ");
+                String pwdInput = input.nextLine().trim();
+                
+                if(pwdInput.equalsIgnoreCase("Y")){
+                    isPWD = true;
+                    // Enforces DOH PSGC 17-digit layout format: RR-PPMM-BBB-NNNNNNN (e.g., 03-5402-013-0000001)
+                    pwdIdNumber = use.customValidator(input, 
+                        "Enter DOH PSGC PWD ID (Format XX-XXXX-XXX-XXXXXXX): ", 
+                        "^\\d{2}-\\d{4}-\\d{3}-\\d{7}$", 
+                        "Invalid format! Must follow the 17-digit DOH PSGC layout (e.g., 03-5402-013-0000001).");
+                    
+                    use.clearScreen();
+                    System.out.println("\n20% PWD Discount applied successfully!");
+                    break;
+                } 
+                else if(pwdInput.equalsIgnoreCase("N")){
+                    isPWD = false;
+                    use.clearScreen();
+                    System.out.println("\nNo discount applied.");
+                    break;
+                } 
+                else {
+                    System.out.println("Invalid input! Please enter only 'Y' or `N`.");
+                }
+            }
+            System.out.println("--------------------------------------");
 
-            System.out.printf("\nGrand total to pay: " + grandTotal);
+            // Calculate totals with per-item discount and VAT
+            double subtotalSum = 0.0;
+            double totalDiscountAmount = 0.0;
+            
+            // Temporary storage to hold discounted item totals for the receipt
+            double[] itemFinalTotals = new double[items.size()];
+            double[] itemDiscounts = new double[items.size()];
+
+            for(int i = 0; i < items.size(); i++){
+                OrderItem order = items.get(i);
+                double originalItemTotal = order.getItemTotal();
+                subtotalSum += originalItemTotal;
+                
+                double itemDiscount = 0.0;
+                if(isPWD){
+                    itemDiscount = originalItemTotal * 0.20; // 20% discount per order item
+                }
+                
+                itemDiscounts[i] = itemDiscount;
+                itemFinalTotals[i] = originalItemTotal - itemDiscount;
+                totalDiscountAmount += itemDiscount;
+            }
+
+            double grandTotal = subtotalSum - totalDiscountAmount;
+            
+            //12% VAT computation (PWDs are legally VAT-exempt under RA 10754)
+            double vatAmount = isPWD ? 0.0 : (grandTotal * 0.12);
+            System.out.println("====================================");
+            System.out.println("          CHECKOUT SUMMARY          ");
+            System.out.println("====================================");
+            System.out.printf("  Subtotal    : PHP %,.2f%n", subtotalSum);
+            if(totalDiscountAmount > 0) {
+                System.out.printf("  PWD Disc    : -PHP %,.2f%n", totalDiscountAmount);
+            }
+            if (isPWD) {
+                System.out.println("  VAT (12%)   : PHP 0.00 (VAT EXEMPT)");
+            } else {
+                System.out.printf("  VAT (12%%)   : PHP %,.2f%n", vatAmount);
+            }
+            System.out.println("------------------------------------");
+            System.out.printf("  GRAND TOTAL : PHP %,.2f%n", grandTotal);
+            System.out.println("====================================");
+            
             Object[] paymentResult = use.paymentProcess(grandTotal, input);
             double cashPaid = (double) paymentResult[0];
             String paymentMethod = (String) paymentResult[1];
             double change = cashPaid - grandTotal;
             
-            //itong format mismo prini print into text file
+            // Print into text file
             try (PrintWriter save = new PrintWriter(new FileOutputStream(filename))) {
                 
                 save.println("==================================================");
@@ -663,6 +778,9 @@ public class potatoCornerPOS {
                 save.println("            "+currentTime);
                 save.println("CUSTOMER NAME : " + userName);
                 save.println("CUSTOMER NUMBER : " + number);
+                if (isPWD) {
+                    save.println("PWD ID NUMBER : " + pwdIdNumber); // <-- Prints PWD ID on receipt if applicable
+                }
                 save.println( "--------------------------------------------------");
                 save.println("            PLEASE GIVE THIS RECEIPT");
                 save.println("          TO A NEARBY VENDOR FOR ORDER");
@@ -671,18 +789,31 @@ public class potatoCornerPOS {
                     OrderItem order = items.get(i);
                     save.println();
                     save.println("ORDER #" + (i + 1));
-                    save.printf("%d x %s Fries%n",order.getQuantity(), order.getSize());
+                    save.printf("%d x %s Fries%n", order.getQuantity(), order.getSize());
                     save.println("Flavors: "+ String.join(", ", order.getFlavors()));
-                    save.printf("Subtotal: PHP %,.2f%n", order.getItemTotal());
+                    if(isPWD && itemDiscounts[i] > 0){
+                        save.printf("Original Subtotal : PHP %,.2f%n", order.getItemTotal());
+                        save.printf("PWD Discount (20%%): -PHP %,.2f%n", itemDiscounts[i]);
+                        save.printf("Item Total        : PHP %,.2f%n", itemFinalTotals[i]);
+                    } else {
+                        save.printf("Subtotal: PHP %,.2f%n", order.getItemTotal());
+                    }
                     save.println( "--------------------------------------------------");
                 }
-                if(discountAmount > 0){
-                    save.printf("DISCOUNT (%.0f%%) : -PHP %,.2f%n", discountPercent, discountAmount);
+                
+                save.printf("SUBTOTAL        : PHP %,.2f%n", subtotalSum);
+                if(totalDiscountAmount > 0){
+                    save.printf("TOTAL PWD DISC  : -PHP %,.2f%n", totalDiscountAmount);
                 }
-                save.printf("GRAND TOTAL : PHP %,.2f%n", grandTotal);
-                save.printf("PAYMENT TYPE: %s%n", paymentMethod);
-                save.printf("CASH PAID   : PHP %,.2f%n", cashPaid);
-                save.printf("CHANGE      : PHP %,.2f%n", change);
+                if (isPWD) {
+                    save.println("VAT (12%)       : PHP 0.00 (VAT EXEMPT)");
+                } else {
+                    save.printf("VAT (12%%)       : PHP %,.2f%n", vatAmount);
+                }
+                save.printf("GRAND TOTAL     : PHP %,.2f%n", grandTotal);
+                save.printf("PAYMENT TYPE    : %s%n", paymentMethod);
+                save.printf("CASH PAID       : PHP %,.2f%n", cashPaid);
+                save.printf("CHANGE          : PHP %,.2f%n", change);
 
                 save.println("==================================================");
                 save.println("          THANK YOU FOR YOUR PURCHASE!");
@@ -693,6 +824,11 @@ public class potatoCornerPOS {
                 System.out.println("                PAYMENT SUCCESSFUL");
                 System.out.println("==================================================");
                 System.out.printf("  Grand Total : PHP %,.2f%n", grandTotal);
+                if (isPWD) {
+                    System.out.println("  VAT (12%)   : PHP 0.00 (VAT EXEMPT)");
+                } else {
+                    System.out.printf("  VAT (12%%)   : PHP %,.2f%n", vatAmount);
+                }
                 System.out.printf("  Cash Paid   : PHP %,.2f%n", cashPaid);
                 System.out.printf("  Change      : PHP %,.2f%n", change);
                 System.out.println("==================================================");
@@ -701,7 +837,6 @@ public class potatoCornerPOS {
                 use.pauseUser(input, "\nerror writing a save \npress any key: " + e.getMessage());
             }
             loadFile(filename,input);
-            // it clears ordered items after payment and printing the receipt so user order new
             items.clear();
         }
     }
